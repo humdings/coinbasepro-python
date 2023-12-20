@@ -13,7 +13,7 @@ import hashlib
 import time
 from threading import Thread
 from websocket import create_connection, WebSocketConnectionClosedException
-from pymongo import MongoClient
+
 from cbpro.cbpro_auth import get_auth_headers
 
 
@@ -23,7 +23,6 @@ class WebsocketClient(object):
             url="wss://ws-feed.pro.coinbase.com",
             products=None,
             message_type="subscribe",
-            mongo_collection=None,
             should_print=True,
             auth=False,
             api_key="",
@@ -46,7 +45,6 @@ class WebsocketClient(object):
         self.api_secret = api_secret
         self.api_passphrase = api_passphrase
         self.should_print = should_print
-        self.mongo_collection = mongo_collection
 
     def start(self):
         def _go():
@@ -133,9 +131,7 @@ class WebsocketClient(object):
     def on_message(self, msg):
         if self.should_print:
             print(msg)
-        if self.mongo_collection:  # dump JSON to given mongo collection
-            self.mongo_collection.insert_one(msg)
-
+        
     def on_error(self, e, data=None):
         self.error = e
         self.stop = True
